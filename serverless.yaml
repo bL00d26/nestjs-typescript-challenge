@@ -48,3 +48,9 @@ functions:
 custom:
   optimize:
     external: ['swagger-ui-dist']
+  jetpack:
+    individually: true 
+    prune: false 
+    exclude: 
+      - .git/**
+      - node_modules/aws-sdk/**

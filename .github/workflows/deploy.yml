@@ -40,16 +40,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Set environment variables
-        run: echo "Setting environment variables"
-        env:
-          PORT: ${{ secrets.PORT }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASS: ${{ secrets.DB_PASS }}
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
