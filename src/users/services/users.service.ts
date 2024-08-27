@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { CreateUserDto } from '../../auth/controllers/dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
+import { AssignUserDto } from '../controllers/dto/assign-role.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,5 +30,21 @@ export class UsersService {
 
   async comparePassword(password: string, hash: string) {
     return await bcrypt.compare(password, hash);
+  }
+
+  async assignRole(
+    userId: number,
+    assignUserDto: AssignUserDto,
+  ): Promise<User> {
+    const user = await this.repository.findOneBy({
+      id: userId,
+    });
+    if (!user) {
+      throw new NotFoundException('USER_DOES_NOT_EXIST');
+    }
+    user.role = assignUserDto.role;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...rest } = await this.repository.save(user);
+    return rest as User;
   }
 }
