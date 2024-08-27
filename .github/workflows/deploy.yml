@@ -5,7 +5,7 @@ on:
     workflows: ["Node.js CI"]
     types:
       - completed
-  
+
 jobs:
   lambda-deploy:
     runs-on: ubuntu-latest
@@ -17,15 +17,31 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '18.x'
-          
+
       - name: Install serverless globally (v3)
         run: npm install -g serverless@3
       
-      - name: Configure serverless authentication
-        run: sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+      - name: Set environment variables
+        run: echo "Setting environment variables"
+        env:
+          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          
       - name: Install npm dependencies
         run: npm ci
      
       - name: Deploy lambda function
         run: sls deploy
+        env:
+          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
