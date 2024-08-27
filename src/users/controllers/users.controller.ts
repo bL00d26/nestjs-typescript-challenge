@@ -19,12 +19,12 @@ import { User } from '../models/user.entity';
 
 @ApiTags('Users')
 @Controller('api/users')
+@Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post('assign-role/:id')
   @HttpCode(200)
-  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @UseGuards(JwtAuthGuard, AssignAdminRoleGuard, RolesGuard)
   @ApiBody({
     schema: {

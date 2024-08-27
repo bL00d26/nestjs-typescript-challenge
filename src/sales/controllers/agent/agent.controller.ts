@@ -22,10 +22,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
+import { Roles } from '../../../decorators/roles.decorator';
+import { UserRole } from '../../../constants/users.constants';
 
 @ApiTags('Agents')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@Roles(UserRole.ADMIN, UserRole.AGENT)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('/api/agents')
 export class AgentController {
   constructor(private agentService: AgentService) {}

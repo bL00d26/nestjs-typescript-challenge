@@ -30,15 +30,19 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
+import { Roles } from '../../../decorators/roles.decorator';
+import { UserRole } from '../../../constants/users.constants';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('/api/orders')
 export class OrderController {
   constructor(private orderService: OrderService) {}
 
   @Get('total-amount-by-customer')
+  @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Get total amount of orders group by customer' })
   @ApiResponse({
     status: 200,
@@ -61,6 +65,7 @@ export class OrderController {
   }
 
   @Get('total-amount-by-agent')
+  @Roles(UserRole.ADMIN, UserRole.AGENT)
   @ApiOperation({ summary: 'Get total amount of orders group by agent' })
   @ApiResponse({
     status: 200,
@@ -83,6 +88,7 @@ export class OrderController {
   }
 
   @Get('total-amount-by-country')
+  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Get total amount of orders group by country' })
   @ApiResponse({
     status: 200,
@@ -105,6 +111,7 @@ export class OrderController {
   }
 
   @Get('/')
+  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Get all orders (paginated)' })
   @ApiQuery({ name: 'page', required: false })
   @ApiResponse({
@@ -199,6 +206,7 @@ export class OrderController {
   }
 
   @Get(':ordNum')
+  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Get an order by ordNum' })
   @ApiResponse({
     status: 200,
@@ -253,6 +261,7 @@ export class OrderController {
   }
 
   @Post()
+  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Create a new order' })
   @ApiBody({ type: CreateOrderDto })
   @ApiResponse({
@@ -286,6 +295,7 @@ export class OrderController {
   }
 
   @Patch(':ordNum')
+  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Update an existing order' })
   @ApiResponse({
     status: 200,
@@ -317,8 +327,8 @@ export class OrderController {
   }
 
   @Delete(':ordNum')
+  @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Delete an existing order by its ordNum' })
-  @ApiOperation({ summary: 'Delete an existing customer by its custCode' })
   @ApiResponse({
     status: 200,
     description: 'Order successfully deleted',
