@@ -22,6 +22,9 @@ provider:
     DB_USER: ${env:DB_USER}
     DB_PASS: ${env:DB_PASS}
     DB_DATABASE: ${env:DB_DATABASE}
+  logs:
+    restApi: true
+    frameworkLambda: true
 
 functions:
   main:
@@ -30,6 +33,7 @@ functions:
       - http:
           method: ANY
           path: /{proxy+}
+          cors: true
 
 custom:
   optimize:
