@@ -6,6 +6,7 @@ useDotenv: true
 
 plugins:
   - serverless-offline
+  - serverless-jetpack
 
 provider:
   name: aws
@@ -14,6 +15,7 @@ provider:
   timeout: 6 # optional, in seconds, default is 6
   stage: dev
   region: us-east-1
+  logRetentionInDays: 1
   environment:
     PORT: ${env:PORT}
     JWT_SECRET: ${env:JWT_SECRET}

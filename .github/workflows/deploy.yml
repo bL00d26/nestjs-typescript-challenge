@@ -8,19 +8,38 @@ on:
 
 jobs:
   lambda-deploy:
+    name: deploy
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
       - name: Checkout to repo
         uses: actions/checkout@v2
 
-      - name: Setup node environment
-        uses: actions/setup-node@v1
+      - name: Setup node environment ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
         with:
-          node-version: '18.x'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install serverless globally (v3)
         run: npm install -g serverless@3
-      
+
+      - name: Install NestJS CLI globally
+        run: npm install -g @nestjs/cli
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: Set environment variables
         run: echo "Setting environment variables"
         env:
@@ -40,8 +59,12 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           
       - name: Install npm dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
-     
+
+      - name: nest build
+        run: npm run build
+
       - name: Deploy lambda function
         run: sls deploy
         env:
