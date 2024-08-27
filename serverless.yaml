@@ -23,9 +23,18 @@ provider:
     DB_PASS: ${env:DB_PASS}
     DB_DATABASE: ${env:DB_DATABASE}
   logs:
-    restApi: true
     frameworkLambda: true
-
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - execute-api:Invoke
+          Resource: "*"
 functions:
   main:
     handler: dist/serverless.handler
