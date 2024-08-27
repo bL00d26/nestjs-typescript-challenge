@@ -9,11 +9,11 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   memorySize: 1024 # optional, in MB, default is 1024
   timeout: 6 # optional, in seconds, default is 6
   stage: dev
-  region: us-east-2
+  region: us-east-1
   environment:
     PORT: ${env:PORT}
     JWT_SECRET: ${env:JWT_SECRET}
