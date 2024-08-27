@@ -12,6 +12,9 @@ import { LocalAuthGuard } from './../guards/local-auth.guard';
 import { AuthService } from './../services/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RegistrationGuard } from '../guards/registration.guard';
+import { UserErrorMessage } from '../../constants/users.constants';
+import { AuthErrorMessage } from '../../constants/auth.constants';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -19,6 +22,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
+  @UseGuards(RegistrationGuard)
   @HttpCode(201)
   @ApiResponse({
     status: 201,
@@ -35,15 +39,30 @@ export class AuthController {
     description: 'User already registered',
     schema: {
       example: {
-        statusCode: 409,
-        message: 'USER_ALREADY_REGISTERED',
+        statusCode: HttpStatus.CONFLICT,
+        message: UserErrorMessage.USER_ALREADY_REGISTERED,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 409,
+    description:
+      'Unauthorized: Only administrators are allowed to assign the admin role.',
+    schema: {
+      example: {
+        message: AuthErrorMessage.ADMIN_ROLE_ASSIGN_REQUIRED,
+        error: 'Unauthorized',
+        statusCode: HttpStatus.UNAUTHORIZED,
       },
     },
   })
   async register(@Body() createUserDto: CreateUserDto): Promise<any> {
     const user = await this.authService.userExists(createUserDto.email);
     if (user) {
-      throw new HttpException('USER_ALREADY_REGISTERED', HttpStatus.CONFLICT);
+      throw new HttpException(
+        UserErrorMessage.USER_ALREADY_REGISTERED,
+        HttpStatus.CONFLICT,
+      );
     }
     return await this.authService.createUser(createUserDto);
   }
@@ -74,8 +93,8 @@ export class AuthController {
     description: 'Unauthorized',
     schema: {
       example: {
-        statusCode: 401,
-        message: 'Unauthorized',
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: AuthErrorMessage.UNAUTHORIZED,
       },
     },
   })

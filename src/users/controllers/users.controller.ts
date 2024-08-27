@@ -11,21 +11,21 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from '../services/users.service';
 import { AssignUserDto } from './dto/assign-role.dto';
 import { Roles } from '../../decorators/roles.decorator';
-import { UserRole } from '../../constants/users.constants';
+import { UserErrorMessage, UserRole } from '../../constants/users.constants';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
-import { CustomAdminGuard } from '../../auth/guards/custom-admin.guard';
+import { AssignAdminRoleGuard } from '../../auth/guards/assign-admin-role.guard';
 import { User } from '../models/user.entity';
 
 @ApiTags('Users')
 @Controller('api/users')
-@UseGuards(JwtAuthGuard, CustomAdminGuard, RolesGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post('assign-role/:id')
   @HttpCode(200)
   @Roles(UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER)
+  @UseGuards(JwtAuthGuard, AssignAdminRoleGuard, RolesGuard)
   @ApiBody({
     schema: {
       example: {
@@ -54,7 +54,7 @@ export class UsersController {
     description: 'User does not exist',
     schema: {
       example: {
-        message: 'USER_DOES_NOT_EXIST',
+        message: UserErrorMessage.USER_DOES_NOT_EXIST,
         error: 'Not Found',
         statusCode: 404,
       },

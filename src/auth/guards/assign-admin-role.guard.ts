@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { UserRole } from '../../constants/users.constants';
 
 @Injectable()
-export class CustomAdminGuard implements CanActivate {
+export class AssignAdminRoleGuard implements CanActivate {
   constructor() {}
 
   canActivate(context: ExecutionContext): boolean {
