@@ -30,10 +30,9 @@ provider:
         - Effect: Allow
           Action:
             - lambda:InvokeFunction
-          Resource: "*"
-        - Effect: Allow
-          Action:
             - execute-api:Invoke
+            - rds:DescribeDBInstances
+            - rds:Connect
           Resource: "*"
 functions:
   main:
