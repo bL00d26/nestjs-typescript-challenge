@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserRole } from '../../constants/users.constants';
+import { AuthErrorMessage } from '../../constants/auth.constants';
 
 @Injectable()
 export class RegistrationGuard implements CanActivate {
@@ -12,7 +13,7 @@ export class RegistrationGuard implements CanActivate {
     const { body } = context.switchToHttp().getRequest();
     if (body.role === UserRole.ADMIN) {
       throw new UnauthorizedException(
-        'Only administrators can assign the admin role.',
+        AuthErrorMessage.ADMIN_ROLE_ASSIGN_REQUIRED,
       );
     }
     return true;
