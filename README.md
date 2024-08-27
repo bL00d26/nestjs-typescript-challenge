@@ -1,35 +1,38 @@
 # nestjs-typescript-challenge
 
-> This challenge-project uses Nest.js to implement three resources (agents, customers and orders) with their respective CRUD endpoints. It also includes pagination when we need to list orders and three special endpoints of orders when we only need the total amount of money grouped by customers, agents, or by countries. This endpoints are protected, so, to consume them, you need to register yourself to get a valid JWT. 
+> This challenge-project uses Nest.js to implement three resources (agents, customers and orders) with their respective CRUD endpoints. It also includes pagination when we need to list orders and three special endpoints of orders when we only need the total amount of money grouped by customers, agents, or by countries. This endpoints are protected, so, to consume them, you need to register yourself to get a valid JWT.
 
-**Your task** is to build an [RBAC system](https://en.wikipedia.org/wiki/Role-based_access_control) adding the following roles: 
+**Your task** is to build an [RBAC system](https://en.wikipedia.org/wiki/Role-based_access_control) adding the following roles:
+
 1. `admin` - has access to all endpoints
 2. `agent` - has access to all endpoints except the ones related to customers
 3. `customer` - has access to all endpoints except the ones related to agents
 4. `guest` - has access only to the endpoints to register and login
 
 **Additionally**:
+
 1. Create a method to assign roles to users and protect the endpoints according to the roles.
 2. Update the documentation to include the new endpoints and the new roles.
 3. Add unit and integration tests to cover the new features.
 4. Add a CI/CD pipeline to run the tests and deploy the application in AWS Lambda. [Example article](https://mayankgupta1338.medium.com/automate-aws-lambda-deployment-using-github-actions-for-nodejs-typescript-applications-4b75c7c17e02).
 5. Add CloudWatch event metrics to monitor the application usage. [Example article](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/graph_a_metric.html).
+
 ---
 
 The already implemented endpoints of the resources are:
 
--  /api/agents
--  /api/customers
--  /api/orders
+- /api/agents
+- /api/customers
+- /api/orders
 
 To register or to login:
 
--  /api/auth/register
--  /api/auth/login
+- /api/auth/register
+- /api/auth/login
 
 The documentation (swagger) can be found at:
 
--  /api/docs
+- /api/docs
 
 ## Table of Contents
 
@@ -108,4 +111,3 @@ To deploy, run the following commands:
 ```bash
 npm run build
 ```
-

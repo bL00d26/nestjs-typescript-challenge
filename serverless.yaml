@@ -1,6 +1,6 @@
 service: nestjs-typescript-challenge
 
-frameworkVersion: "3"
+frameworkVersion: '3'
 
 useDotenv: true
 
@@ -14,7 +14,7 @@ provider:
   timeout: 6 # optional, in seconds, default is 6
   stage: dev
   region: us-east-2
-  environment: 
+  environment:
     PORT: ${env:PORT}
     JWT_SECRET: ${env:JWT_SECRET}
     DB_HOST: ${env:DB_HOST}
