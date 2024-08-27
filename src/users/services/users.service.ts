@@ -5,6 +5,7 @@ import { User } from '../models/user.entity';
 import { CreateUserDto } from '../../auth/controllers/dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { AssignUserDto } from '../controllers/dto/assign-role.dto';
+import { UserErrorMessage } from '../../constants/users.constants';
 
 @Injectable()
 export class UsersService {
@@ -40,7 +41,7 @@ export class UsersService {
       id: userId,
     });
     if (!user) {
-      throw new NotFoundException('USER_DOES_NOT_EXIST');
+      throw new NotFoundException(UserErrorMessage.USER_DOES_NOT_EXIST);
     }
     user.role = assignUserDto.role;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
