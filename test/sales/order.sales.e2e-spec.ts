@@ -10,6 +10,7 @@ import { Agent } from '../../src/sales/models/agent.entity';
 import { Customer } from '../../src/sales/models/customer.entity';
 import { Order } from '../../src/sales/models/order.entity';
 import { User } from '../../src/users/models/user.entity';
+import { UserRole } from '../../src/constants/users.constants';
 
 jest.mock('nestjs-typeorm-paginate', () => ({
   paginate: jest.fn().mockResolvedValue({
@@ -40,7 +41,7 @@ jest.mock('bcryptjs', () => {
   };
 });
 
-describe('SalesController (e2e)', () => {
+describe('OrderController (e2e)', () => {
   let app: INestApplication;
 
   const order = {
@@ -109,7 +110,9 @@ describe('SalesController (e2e)', () => {
   const mockUserRepository = {
     findOne: jest
       .fn()
-      .mockImplementation((user) => Promise.resolve({ ...user, id: 1 })),
+      .mockImplementation((user) =>
+        Promise.resolve({ ...user, id: 1, role: UserRole.ADMIN }),
+      ),
   };
 
   beforeEach(async () => {
@@ -178,6 +181,18 @@ describe('SalesController (e2e)', () => {
         },
       });
   });
+  it('/api/orders (GET) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .get('/api/orders')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
 
   it('/api/orders (POST)', async () => {
     return request(app.getHttpServer())
@@ -195,6 +210,21 @@ describe('SalesController (e2e)', () => {
       .auth(await getValidToken(), { type: 'bearer' })
       .send({})
       .expect(400)
+      .expect('Content-Type', /application\/json/);
+  });
+
+  it('/api/orders (POST) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+
+    return request(app.getHttpServer())
+      .post('/api/orders')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .send(order)
+      .expect(403)
       .expect('Content-Type', /application\/json/);
   });
 
@@ -217,6 +247,20 @@ describe('SalesController (e2e)', () => {
       .expect('Content-Type', /application\/json/);
   });
 
+  it('/api/orders (UPDATE) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .patch('/api/orders/200101')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .send({ custCode: 'C00001' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
+
   it('/api/orders (DELETE)', async () => {
     return request(app.getHttpServer())
       .delete('/api/orders/200101')
@@ -229,7 +273,20 @@ describe('SalesController (e2e)', () => {
       });
   });
 
-  it('should get total amount by customer', async () => {
+  it('/api/orders (DELETE) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .delete('/api/orders/200101')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
+
+  it('/api/orders/total-amount-by-customer (GET) should get total amount by customer', async () => {
     return request(app.getHttpServer())
       .get('/api/orders/total-amount-by-customer')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -242,8 +299,20 @@ describe('SalesController (e2e)', () => {
         },
       ]);
   });
+  it('/api/orders/total-amount-by-customer (GET) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .get('/api/orders/total-amount-by-customer')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
 
-  it('should get total amount by agent', async () => {
+  it('/api/orders/total-amount-by-agent (GET) should get total amount by agent', async () => {
     return request(app.getHttpServer())
       .get('/api/orders/total-amount-by-agent')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -257,7 +326,20 @@ describe('SalesController (e2e)', () => {
       ]);
   });
 
-  it('should get total amount by country', async () => {
+  it('/api/orders/total-amount-by-agent (GET) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .get('/api/orders/total-amount-by-agent')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
+
+  it('/api/orders/total-amount-by-country (GET) should get total amount by country', async () => {
     return request(app.getHttpServer())
       .get('/api/orders/total-amount-by-country')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -269,5 +351,17 @@ describe('SalesController (e2e)', () => {
           totalOrdAmount: '7700.00',
         },
       ]);
+  });
+  it('/api/orders/total-amount-by-country (GET) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .get('/api/orders/total-amount-by-country')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
   });
 });

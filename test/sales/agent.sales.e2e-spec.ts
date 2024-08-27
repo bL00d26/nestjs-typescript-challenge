@@ -10,6 +10,7 @@ import { Agent } from '../../src/sales/models/agent.entity';
 import { Customer } from '../../src/sales/models/customer.entity';
 import { Order } from '../../src/sales/models/order.entity';
 import { User } from '../../src/users/models/user.entity';
+import { UserRole } from '../../src/constants/users.constants';
 
 jest.mock('bcryptjs', () => {
   return {
@@ -17,7 +18,7 @@ jest.mock('bcryptjs', () => {
   };
 });
 
-describe('SalesController (e2e)', () => {
+describe('AgentsController (e2e)', () => {
   let app: INestApplication;
 
   const agent = {
@@ -51,7 +52,9 @@ describe('SalesController (e2e)', () => {
   const mockUserRepository = {
     findOne: jest
       .fn()
-      .mockImplementation((user) => Promise.resolve({ ...user, id: 1 })),
+      .mockImplementation((user) =>
+        Promise.resolve({ ...user, id: 1, role: UserRole.ADMIN }),
+      ),
   };
 
   beforeEach(async () => {
@@ -102,6 +105,19 @@ describe('SalesController (e2e)', () => {
       .expect([agent]);
   });
 
+  it('/api/agents (GET) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .get('/api/agents')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
+
   it('/api/agents (POST)', async () => {
     return request(app.getHttpServer())
       .post('/api/agents')
@@ -110,6 +126,20 @@ describe('SalesController (e2e)', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .expect(agent);
+  });
+
+  it('/api/agents (POST) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .post('/api/agents')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .send(agent)
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
   });
 
   it('/api/agents (POST) should fail because missing parameters', async () => {
@@ -140,6 +170,20 @@ describe('SalesController (e2e)', () => {
       .expect('Content-Type', /application\/json/);
   });
 
+  it('/api/agents (UPDATE) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .patch('/api/agents/A001')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .send({ agentName: 'Jhon Smith' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
+  });
+
   it('/api/agents (DELETE)', async () => {
     return request(app.getHttpServer())
       .delete('/api/agents/A001')
@@ -150,5 +194,18 @@ describe('SalesController (e2e)', () => {
         raw: [],
         affected: 1,
       });
+  });
+
+  it('/api/agents (DELETE) should fail because of an invalid user role', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce({
+      id: 2,
+      email: 'guest@demo.com',
+      role: 'guest',
+    });
+    return request(app.getHttpServer())
+      .delete('/api/agents/A001')
+      .auth(await getValidToken(), { type: 'bearer' })
+      .expect(403)
+      .expect('Content-Type', /application\/json/);
   });
 });
