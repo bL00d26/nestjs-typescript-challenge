@@ -1024,6 +1024,12 @@ CREATE TABLE `users` (
     `last_name` char(40) DEFAULT NULL,
     `email` char(40) DEFAULT NULL,
     `password` char(80) NOT NULL,
+    `role` ENUM(
+        'guest',
+        'customer',
+        'agent',
+        'admin'
+    ) DEFAULT 'guest',
     `created_at` timestamp(6) NULL DEFAULT current_timestamp(6),
     `updated_at` timestamp(6) NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
     `deleted_at` timestamp(6) NULL DEFAULT NULL
