@@ -25,6 +25,7 @@ import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../decorators/roles.decorator';
 import { UserRole } from '../../../constants/users.constants';
+import { AuthForbiddenErrorSwagger } from '../../../constants/auth.constants';
 
 @ApiTags('Agents')
 @ApiBearerAuth()
@@ -60,6 +61,7 @@ export class AgentController {
       ],
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async findAll() {
     return this.agentService.findAll();
   }
@@ -105,6 +107,7 @@ export class AgentController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async findById(@Param('agentCode') agentCode: string) {
     const data = await this.agentService.findOneById(agentCode);
     if (!data) {
@@ -141,6 +144,7 @@ export class AgentController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async create(@Body() createAgentDto: CreateAgentDto): Promise<Agent> {
     return this.agentService.create(createAgentDto);
   }
@@ -159,6 +163,7 @@ export class AgentController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async update(
     @Param('agentCode') agentCode: string,
     @Body() updateAgentDto: UpdateAgentDto,
@@ -189,6 +194,7 @@ export class AgentController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async delete(@Param('agentCode') agentCode: string): Promise<DeleteResult> {
     return this.agentService.delete(agentCode);
   }

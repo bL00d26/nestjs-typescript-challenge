@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Param,
   Post,
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { AssignAdminRoleGuard } from '../../auth/guards/assign-admin-role.guard';
 import { User } from '../models/user.entity';
+import { AuthForbiddenErrorSwagger } from '../../constants/auth.constants';
 
 @ApiTags('Users')
 @Controller('api/users')
@@ -26,28 +28,11 @@ export class UsersController {
   @Post('assign-role/:id')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard, AssignAdminRoleGuard, RolesGuard)
-  @ApiBody({
-    schema: {
-      example: {
-        role: 'agent',
-      },
-    },
-  })
+  @ApiBody({ type: AssignUserDto })
   @ApiResponse({
     status: 200,
     description: 'Role assigned',
-    schema: {
-      example: {
-        id: '2',
-        firstName: 'Martin',
-        lastName: 'Perez',
-        email: 'martin.perez@sundevs.com',
-        role: 'admin',
-        createAt: '2024-08-27T06:14:15.051Z',
-        updateAt: '2024-08-27T09:44:23.399Z',
-        deletedAt: null,
-      },
-    },
+    type: User,
   })
   @ApiResponse({
     status: 404,
@@ -60,10 +45,24 @@ export class UsersController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async assignRole(
     @Param('id') id: string,
     @Body() assignUserDto: AssignUserDto,
   ): Promise<User> {
     return await this.usersService.assignRole(Number(id), assignUserDto);
+  }
+
+  @Get()
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiResponse({
+    status: 200,
+    description: 'All users from the database',
+    type: [User],
+  })
+  @ApiResponse(AuthForbiddenErrorSwagger)
+  async getAll(): Promise<User[]> {
+    return await this.usersService.getAll();
   }
 }

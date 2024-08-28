@@ -7,12 +7,19 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../../constants/users.constants';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'users' })
 export class User {
+  @ApiProperty({
+    example: 1,
+  })
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
+  @ApiProperty({
+    example: 'Martin',
+  })
   @Column({
     name: 'first_name',
     type: 'char',
@@ -21,6 +28,9 @@ export class User {
   })
   firstName: string;
 
+  @ApiProperty({
+    example: 'Perez',
+  })
   @Column({
     name: 'last_name',
     type: 'char',
@@ -29,6 +39,9 @@ export class User {
   })
   lastName: string;
 
+  @ApiProperty({
+    example: 'martin.perez@sundevs.com',
+  })
   @Column({
     name: 'email',
     type: 'char',
@@ -46,6 +59,9 @@ export class User {
   })
   password: string;
 
+  @ApiProperty({
+    example: 'admin',
+  })
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -53,6 +69,9 @@ export class User {
   })
   role: UserRole;
 
+  @ApiProperty({
+    example: '2024-08-27T06:14:15.051Z',
+  })
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
@@ -60,6 +79,9 @@ export class User {
   })
   createAt: Date;
 
+  @ApiProperty({
+    example: '2024-08-27T06:14:15.051Z',
+  })
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
@@ -67,6 +89,9 @@ export class User {
   })
   updateAt: Date;
 
+  @ApiProperty({
+    example: null,
+  })
   @DeleteDateColumn({
     name: 'deleted_at',
     type: 'timestamp',

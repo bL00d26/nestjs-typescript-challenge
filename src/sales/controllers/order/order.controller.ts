@@ -33,6 +33,7 @@ import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../decorators/roles.decorator';
 import { UserRole } from '../../../constants/users.constants';
+import { AuthForbiddenErrorSwagger } from '../../../constants/auth.constants';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
@@ -60,6 +61,7 @@ export class OrderController {
       ],
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async totalAmoutByCustomer() {
     return await this.orderService.totalAmountByCustomer();
   }
@@ -83,6 +85,7 @@ export class OrderController {
       ],
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async totalAmoutByAgent() {
     return await this.orderService.totalAmountByAgent();
   }
@@ -106,6 +109,7 @@ export class OrderController {
       ],
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async totalAmoutByCountry() {
     return await this.orderService.totalAmountByCountry();
   }
@@ -193,6 +197,7 @@ export class OrderController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async findAll(
     @Req() req: Request,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: 1,
@@ -252,6 +257,7 @@ export class OrderController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async findById(@Param('ordNum') ordNum: number) {
     const data = await this.orderService.findOneById(ordNum);
     if (!data) {
@@ -290,6 +296,7 @@ export class OrderController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
     return this.orderService.create(createOrderDto);
   }
@@ -319,6 +326,7 @@ export class OrderController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async update(
     @Param('ordNum') ordNum: number,
     @Body() updateOrderDto: UpdateOrderDto,
@@ -350,6 +358,7 @@ export class OrderController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async delete(@Param('ordNum') ordNum: number): Promise<DeleteResult> {
     return this.orderService.delete(ordNum);
   }

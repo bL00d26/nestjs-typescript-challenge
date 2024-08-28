@@ -48,4 +48,11 @@ export class UsersService {
     const { password, ...rest } = await this.repository.save(user);
     return rest as User;
   }
+
+  async getAll(): Promise<User[]> {
+    return (await this.repository.find()).map(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ({ password, ...rest }) => rest as User,
+    );
+  }
 }

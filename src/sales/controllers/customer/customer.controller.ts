@@ -25,6 +25,7 @@ import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../decorators/roles.decorator';
 import { UserRole } from '../../../constants/users.constants';
+import { AuthForbiddenErrorSwagger } from '../../../constants/auth.constants';
 
 @ApiTags('Customers')
 @ApiBearerAuth()
@@ -65,6 +66,7 @@ export class CustomerController {
       ],
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async findAll() {
     return this.customerService.findAll();
   }
@@ -108,6 +110,7 @@ export class CustomerController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async findById(@Param('custCode') custCode: string) {
     const data = await this.customerService.findOneById(custCode);
     if (!data) {
@@ -150,6 +153,7 @@ export class CustomerController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async create(
     @Body() createCustomerDto: CreateCustomerDto,
   ): Promise<Customer> {
@@ -181,6 +185,7 @@ export class CustomerController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async update(
     @Param('custCode') custCode: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
@@ -211,6 +216,7 @@ export class CustomerController {
       },
     },
   })
+  @ApiResponse(AuthForbiddenErrorSwagger)
   async delete(@Param('custCode') custCode: string): Promise<DeleteResult> {
     return this.customerService.delete(custCode);
   }

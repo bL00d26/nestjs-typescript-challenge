@@ -29,6 +29,7 @@ describe('UsersController', () => {
   beforeEach(async () => {
     usersService = {
       assignRole: jest.fn().mockResolvedValue(mockUser),
+      getAll: jest.fn().mockResolvedValue([mockUser]),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -66,6 +67,24 @@ describe('UsersController', () => {
         new NotFoundException(UserErrorMessage.USER_DOES_NOT_EXIST),
       );
       expect(usersService.assignRole).toHaveBeenCalledWith(999, assignUserDto);
+    });
+  });
+
+  describe('getAll', () => {
+    it('should return an array of users', async () => {
+      const result = await controller.getAll();
+
+      expect(result).toEqual([mockUser]);
+      expect(usersService.getAll).toHaveBeenCalled();
+    });
+
+    it('should return an empty array if no users are found', async () => {
+      jest.spyOn(usersService, 'getAll').mockResolvedValueOnce([]);
+
+      const result = await controller.getAll();
+
+      expect(result).toEqual([]);
+      expect(usersService.getAll).toHaveBeenCalled();
     });
   });
 });

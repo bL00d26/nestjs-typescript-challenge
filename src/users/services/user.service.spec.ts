@@ -164,4 +164,30 @@ describe('UsersService', () => {
       );
     });
   });
+
+  describe('getAll', () => {
+    it('should return an array of users', async () => {
+      jest.spyOn(repository, 'find').mockResolvedValue([mockUser]);
+
+      const result = await service.getAll();
+
+      expect(result).toEqual([
+        {
+          id: mockUser.id,
+          email: mockUser.email,
+          role: mockUser.role,
+        },
+      ]);
+      expect(repository.find).toHaveBeenCalled();
+    });
+
+    it('should return an empty array if no users are found', async () => {
+      jest.spyOn(repository, 'find').mockResolvedValue([]);
+
+      const result = await service.getAll();
+
+      expect(result).toEqual([]);
+      expect(repository.find).toHaveBeenCalled();
+    });
+  });
 });
