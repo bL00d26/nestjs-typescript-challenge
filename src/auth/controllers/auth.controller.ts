@@ -11,7 +11,7 @@ import {
 import { LocalAuthGuard } from './../guards/local-auth.guard';
 import { AuthService } from './../services/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegistrationGuard } from '../guards/registration.guard';
 import { UserErrorMessage } from '../../constants/users.constants';
 import { AuthErrorMessage } from '../../constants/auth.constants';
@@ -24,6 +24,7 @@ export class AuthController {
   @Post('register')
   @UseGuards(RegistrationGuard)
   @HttpCode(201)
+  @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({
     status: 201,
     description: 'Register a new user',
@@ -70,6 +71,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
+  @ApiOperation({ summary: 'Get a new access token with the credentials' })
   @ApiBody({
     schema: {
       example: {

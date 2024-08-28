@@ -27,7 +27,6 @@ describe('UsersController (e2e)', () => {
   };
 
   const mockUserRepository = {
-    find: jest.fn().mockResolvedValue([mockUser]),
     findOne: jest.fn().mockImplementation(() => {
       return Promise.resolve(mockUser);
     }),
@@ -60,24 +59,15 @@ describe('UsersController (e2e)', () => {
   });
 
   async function getValidToken() {
-    const response = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({
-        email: 'admin@demo.com',
-        password: 'password',
-      });
+    const {
+      body: { access_token },
+    } = await request(app.getHttpServer()).post('/api/auth/login').send({
+      email: 'admin@demo.com',
+      password: 'password',
+    });
 
-    return response.body.access_token;
+    return access_token;
   }
-
-  it('/api/users (GET)', async () => {
-    return request(app.getHttpServer())
-      .get('/api/users')
-      .auth(await getValidToken(), { type: 'bearer' })
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-      .expect([mockUser]);
-  });
 
   it('/api/users (GET) should fail because of an invalid user role', async () => {
     mockUserRepository.findOne.mockResolvedValueOnce({

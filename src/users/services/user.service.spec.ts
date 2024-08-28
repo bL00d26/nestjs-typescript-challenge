@@ -1,14 +1,32 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from '../../auth/controllers/dto/create-user.dto';
 import { AssignUserDto } from '../controllers/dto/assign-role.dto';
 import { UserErrorMessage, UserRole } from '../../constants/users.constants';
 
+jest.mock('nestjs-typeorm-paginate', () => {
+  const actualModule = jest.requireActual('nestjs-typeorm-paginate');
+  return {
+    ...actualModule,
+    paginate: jest.fn(),
+    Pagination: jest.fn().mockImplementation((items, meta, links) => ({
+      items,
+      meta,
+      links,
+    })),
+  };
+});
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
   compare: jest.fn(),
@@ -25,6 +43,23 @@ describe('UsersService', () => {
     role: UserRole.ADMIN,
   } as User;
 
+  const mockPaginationResult: Pagination<User> = {
+    items: [mockUser],
+    meta: {
+      totalItems: 1,
+      itemCount: 1,
+      itemsPerPage: 10,
+      totalPages: 1,
+      currentPage: 1,
+    },
+    links: {
+      first: 'link',
+      previous: '',
+      next: '',
+      last: 'link',
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -39,7 +74,6 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
     repository = module.get<Repository<User>>(getRepositoryToken(User));
   });
-
   describe('findOneByEmail', () => {
     it('should return a user if found', async () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser);
@@ -164,30 +198,50 @@ describe('UsersService', () => {
       );
     });
   });
-
   describe('getAll', () => {
-    it('should return an array of users', async () => {
-      jest.spyOn(repository, 'find').mockResolvedValue([mockUser]);
+    it('should return a paginated list of users without passwords', async () => {
+      (paginate as jest.Mock).mockResolvedValueOnce(mockPaginationResult);
 
-      const result = await service.getAll();
+      const options: IPaginationOptions = { page: 1, limit: 10 };
 
-      expect(result).toEqual([
-        {
-          id: mockUser.id,
-          email: mockUser.email,
-          role: mockUser.role,
-        },
-      ]);
-      expect(repository.find).toHaveBeenCalled();
+      const result = await service.getAll(options);
+
+      expect(result.items).toEqual(
+        mockPaginationResult.items.map(({ password, ...rest }) => rest),
+      );
+      expect(result.meta).toEqual(mockPaginationResult.meta);
+      expect(result.links).toEqual(mockPaginationResult.links);
     });
 
-    it('should return an empty array if no users are found', async () => {
-      jest.spyOn(repository, 'find').mockResolvedValue([]);
+    it('should return an empty paginated list when no users are found', async () => {
+      const emptyPaginationResult: Pagination<User> = {
+        items: [],
+        meta: {
+          totalItems: 0,
+          itemCount: 0,
+          itemsPerPage: 10,
+          totalPages: 0,
+          currentPage: 1,
+        },
+        links: {
+          first: 'link',
+          previous: '',
+          next: '',
+          last: 'link',
+        },
+      };
 
-      const result = await service.getAll();
+      (paginate as jest.Mock).mockResolvedValueOnce(emptyPaginationResult);
 
-      expect(result).toEqual([]);
-      expect(repository.find).toHaveBeenCalled();
+      const options: IPaginationOptions = { page: 1, limit: 10 };
+
+      const result = await service.getAll(options);
+
+      expect(result.items).toEqual([]);
+      expect(result.meta.totalItems).toBe(0);
+      expect(result.meta.itemCount).toBe(0);
+      expect(result.meta.totalPages).toBe(0);
+      expect(result.links).toEqual(emptyPaginationResult.links);
     });
   });
 });
